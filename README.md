@@ -1,21 +1,17 @@
-Kafka Connect SMT to add a random [UUID](https://docs.oracle.com/javase/7/docs/api/java/util/UUID.html)
+Kafka Connect SMT to add current linux [timestamp]https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html)
 
-This SMT supports inserting a UUID into the record Key or Value
+This SMT supports inserting a timestamp into the record Key or Value
 Properties:
 
-|Name|Description|Type|Default|Importance|
-|---|---|---|---|---|
-|`uuid.field.name`| Field name for UUID | String | `uuid` | High |
+| Name                    |Description|Type|Default|Importance|
+|-------------------------|---|---|---|---|
+| `current_ts.field.name` | Field name for UUID | String | `current_ts` | High |
 
 Example on how to add to your connector:
 ```
-transforms=insertuuid
-transforms.insertuuid.type=com.github.cjmatta.kafka.connect.smt.InsertUuid$Value
-transforms.insertuuid.uuid.field.name="uuid"
+transforms=currentTs
+transforms.currentTs.type=ru.rgs.kafka.connect.smt.CurrentTimestamp$Value
+transforms.currentTs.current_ts.field.name="current_ts"
 ```
-
-
-ToDO
-* ~~add support for records without schemas~~
 
 Lots borrowed from the Apache Kafka® `InsertField` SMT
