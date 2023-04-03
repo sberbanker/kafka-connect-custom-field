@@ -1,6 +1,6 @@
 Kafka Connect SMT to add current linux [timestamp](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html).
 
-This SMT supports inserting a timestamp into the record Key or Value
+This SMT supports inserting a timestamp in milliseconds into the record Key or Value
 Properties:
 
 | Name                    |Description|Type|Default|Importance|

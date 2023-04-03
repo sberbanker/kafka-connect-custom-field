@@ -6,7 +6,7 @@
 
     <groupId>ru.rgs.kafka.connect.smt</groupId>
     <artifactId>kafka-connect-custom-field</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -44,7 +44,7 @@
                 <updatePolicy>never</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
-            <id>confluentinc</id>
+            <id>confluent inc</id>
             <name>Confluent maven repo</name>
             <url>https://packages.confluent.io/maven/</url>
             <layout>default</layout>

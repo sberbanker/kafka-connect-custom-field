@@ -115,7 +115,7 @@ public abstract class CurrentTimestamp<R extends ConnectRecord<R>> implements Tr
     }
 
     private Long getCurrentTs() {
-        return Instant.now().getEpochSecond();
+        return System.currentTimeMillis();
     }
 
     private Schema makeUpdatedSchema(Schema schema) {
