@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.rgs.kafka.connect.smt;
+package ru.rgs.kafka.connect.transforms;
 
 import org.apache.kafka.common.cache.Cache;
 import org.apache.kafka.common.cache.LRUCache;
@@ -30,7 +30,6 @@ import org.apache.kafka.connect.transforms.Transformation;
 import org.apache.kafka.connect.transforms.util.SchemaUtil;
 import org.apache.kafka.connect.transforms.util.SimpleConfig;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 

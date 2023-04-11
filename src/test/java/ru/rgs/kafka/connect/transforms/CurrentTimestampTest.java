@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.rgs.kafka.connect.smt;
+package ru.rgs.kafka.connect.transforms;
 
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
