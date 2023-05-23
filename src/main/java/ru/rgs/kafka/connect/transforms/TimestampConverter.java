@@ -47,6 +47,10 @@ import ru.rgs.kafka.connect.transforms.TimestampConverter;
 
 public abstract class TimestampConverter<R extends ConnectRecord<R>> implements Transformation<R> {
 
+    public static final String OVERVIEW_DOC =
+            "Convert timestamps between different formats such as Unix epoch, strings, and Connect Date/Timestamp types." +
+            "Applies to individual fields or to the entire value." + "<p/>Use the concrete transformation type designed for the record key (<code>" + TimestampConverter.Key.class.getName() + "</code>) " + "or value (<code>" + TimestampConverter.Value.class.getName() + "</code>).";
+
     //region Config
     private Config config;
     private Cache<Schema, Schema> schemaUpdateCache;
