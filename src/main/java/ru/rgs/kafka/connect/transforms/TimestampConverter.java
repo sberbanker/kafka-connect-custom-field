@@ -37,6 +37,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStructOrNull;
@@ -77,10 +78,11 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
     }
 
     private static class Config {
-        Config(String fields, String type, String pattern, DateTimeFormatter dateTimeFormatter) {
+        Config(String fields, String type, String pattern, DateTimeFormatter dateTimeFormatter, int offset) {
             this.pattern = pattern;
             this.type = type;
             this.dateTimeFormatter = dateTimeFormatter;
+            this.offset = offset;
 
             if (!isBlank(fields)) {
                 this.fields = Arrays.stream(fields.split(",")).map(String::trim).collect(Collectors.toSet());
@@ -91,6 +93,7 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
         String type;
         String pattern;
         final DateTimeFormatter dateTimeFormatter;
+        int offset;
 
     }
 
@@ -138,8 +141,10 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
             }
         }
 
+        int offset = TimeZone.getTimeZone(zoneId).getRawOffset();
+
         timeZone = TimeZone.getTimeZone(zoneId);
-        config = new Config(fields, type, formatPattern, formatter);
+        config = new Config(fields, type, formatPattern, formatter, offset);
     }
     //endregion
 
@@ -204,7 +209,7 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
             public Date toRaw(Config config, Object orig) {
                 if (!(orig instanceof Long))
                     throw new DataException("Expected Unix timestamp to be a Long, but found " + orig.getClass());
-                return Timestamp.toLogical(Timestamp.SCHEMA, (Long) orig);
+                return Timestamp.toLogical(Timestamp.SCHEMA, (Long) orig + config.offset);
             }
 
             @Override
