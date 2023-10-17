@@ -5,7 +5,8 @@
 Сейчас доступны:
 * трансформация _CurrentTimestamp_ - позволяет добавлять в сообщение временную метку, для использования в потребителе.
 * трансформация _LowerCaseTopic_ - позволяет преобразовать название топика в нижний регистр.
-* трансформация _TimestampConverter_ - позволяет преобразовывать date, time или timestamp между разными форматами, например из String в Unix epoch. Основа честно украдена у [howareyouo](https://github.com/howareyouo/kafka-connect-timestamp-converter). Для String изменён тип форматировщика с `java.text.SimpleDateFormat` на `java.time.format.DateTimeFormatter`, что позволяет использовать шаблоны с [необязательными параметрами](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).  
+* трансформация _TimestampConverter_ - позволяет преобразовывать date, time или timestamp между разными форматами, например из String в Unix epoch. Основа честно украдена у [howareyouo](https://github.com/howareyouo/kafka-connect-timestamp-converter). Для String изменён тип форматировщика с `java.text.SimpleDateFormat` на `java.time.format.DateTimeFormatter`, что позволяет использовать шаблоны с [необязательными параметрами](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
+* трансформация _LowerCaseField_ - позволяет преобразовать названия полей в ключе или значении сообщения в нижний регистр.
 
 ### <ins>Примеры использования</ins>
 
@@ -50,4 +51,9 @@
 |`"2023-05-23T13:54:56.8662013+05:00"`|`2023-05-23 13:54:56.866`|
 |`"2023-05-23T17:54:56.422+07:00"`|`2023-05-23 13:54:56.422`|
 
-
+#### LowerCaseField
+```json lines
+"transforms": "keyToLower,valueToLower",
+"transforms.keyToLower.type": "ru.rgs.kafka.connect.transforms.LowerCaseField$Key",
+"transforms.valueToLower.type": "ru.rgs.kafka.connect.transforms.LowerCaseField$Value"
+```

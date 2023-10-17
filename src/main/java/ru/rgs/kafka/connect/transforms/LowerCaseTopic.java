@@ -28,7 +28,6 @@ public class LowerCaseTopic<R extends ConnectRecord<R>> implements Transformatio
 
     public static final String OVERVIEW_DOC =
             "This transformation is used to change a topic name to be all lower case.";
-    Time time = SystemTime.SYSTEM;
 
     @Override
     public R apply(R record) {
