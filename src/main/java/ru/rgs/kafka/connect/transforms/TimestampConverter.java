@@ -30,14 +30,11 @@ import org.apache.kafka.connect.transforms.Transformation;
 import org.apache.kafka.connect.transforms.util.SchemaUtil;
 import org.apache.kafka.connect.transforms.util.SimpleConfig;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStructOrNull;
@@ -55,7 +52,6 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
     //region Config
     private Config config;
     private Cache<Schema, Schema> schemaUpdateCache;
-    private TimeZone timeZone;
     public static final String FIELDS_CONFIG = "fields";
     private static final String FIELD_DEFAULT = "";
     public static final String TARGET_TYPE_CONFIG = "target.type";
@@ -143,7 +139,7 @@ public abstract class TimestampConverter<R extends ConnectRecord<R>> implements 
 
         int offset = TimeZone.getTimeZone(zoneId).getRawOffset();
 
-        timeZone = TimeZone.getTimeZone(zoneId);
+        TimeZone.getTimeZone(zoneId);
         config = new Config(fields, type, formatPattern, formatter, offset);
     }
     //endregion

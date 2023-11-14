@@ -6,7 +6,7 @@
 
     <groupId>ru.rgs.kafka.connect</groupId>
     <artifactId>kafka-connect-rgs-custom-ops</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.3</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -17,12 +17,12 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-api</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-transforms</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -55,6 +55,11 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.5</version>
         </dependency>
+        <dependency>
+            <groupId>io.debezium</groupId>
+            <artifactId>debezium-core</artifactId>
+            <version>2.4.0.Final</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -73,6 +78,22 @@
             <name>Confluent maven repo</name>
             <url>https://packages.confluent.io/maven/</url>
             <layout>default</layout>
+        </repository>
+        <repository>
+            <id>repo1-maven-org</id>
+            <name>repo1.maven.org</name>
+            <url>https://repo1.maven.org/maven2/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
         </repository>
     </repositories>
 </project>

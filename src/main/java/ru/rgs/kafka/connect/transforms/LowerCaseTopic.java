@@ -17,8 +17,6 @@
 package ru.rgs.kafka.connect.transforms;
 
 import org.apache.kafka.common.config.ConfigDef;
-import org.apache.kafka.common.utils.SystemTime;
-import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.transforms.Transformation;
 
