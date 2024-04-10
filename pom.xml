@@ -6,7 +6,7 @@
 
     <groupId>ru.rgs.kafka.connect</groupId>
     <artifactId>kafka-connect-rgs-custom-ops</artifactId>
-    <version>1.5.3</version>
+    <version>1.6.8</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

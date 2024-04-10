@@ -7,6 +7,8 @@
 * трансформация _LowerCaseTopic_ - позволяет преобразовать название топика в нижний регистр.
 * трансформация _TimestampConverter_ - позволяет преобразовывать date, time или timestamp между разными форматами, например из String в Unix epoch. Основа честно украдена у [howareyouo](https://github.com/howareyouo/kafka-connect-timestamp-converter). Для String изменён тип форматировщика с `java.text.SimpleDateFormat` на `java.time.format.DateTimeFormatter`, что позволяет использовать шаблоны с [необязательными параметрами](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
 * трансформация _LowerCaseField_ - позволяет преобразовать названия полей в ключе или значении сообщения в нижний регистр.
+* трансформация _StructConverter_ - 
+* трансформация _ClearUnicodeNull_ - 
 
 ### <ins>Примеры использования</ins>
 
@@ -28,7 +30,6 @@
 ```
 
 #### TimestampConverter
-
 | Name                    | Description                                                                                                                                              |Type| Default | Importance |
 |-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|---|---------|------------|
 | `fields` | The field containing the timestamp, or empty if the entire value is a timestamp| String |         | High       |
@@ -56,4 +57,23 @@
 "transforms": "keyToLower,valueToLower",
 "transforms.keyToLower.type": "ru.rgs.kafka.connect.transforms.LowerCaseField$Key",
 "transforms.valueToLower.type": "ru.rgs.kafka.connect.transforms.LowerCaseField$Value"
+```
+
+#### StructConverter
+```json lines
+"transforms": "keyStructCast,valueStructCast",
+"transforms.keyStructCast.type": "ru.rgs.kafka.connect.transforms.StructConverter$Key",
+"transforms.valueStructCast.type": "ru.rgs.kafka.connect.transforms.StructConverter$Value"
+```
+
+#### ClearUnicodeNull
+```json lines
+"transforms": "ClearUnicode",
+"transforms.ClearUnicode.type": "ru.rgs.kafka.connect.transforms.ClearUnicodeNull$Value",
+"transforms.ClearUnicode.fields": "dirtyfield",
+"transforms.ClearUnicode.predicate": "IsFoo",
+
+"predicates": "IsFoo",
+"predicates.IsFoo.type": "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+"predicates.IsFoo.pattern": "foo",
 ```
