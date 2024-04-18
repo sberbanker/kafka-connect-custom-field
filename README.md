@@ -66,12 +66,13 @@
 "transforms.valueStructCast.type": "ru.rgs.kafka.connect.transforms.StructConverter$Value"
 ```
 
-#### ClearUnicodeNull
+#### RemoveString
 ```json lines
-"transforms": "ClearUnicode",
-"transforms.ClearUnicode.type": "ru.rgs.kafka.connect.transforms.RemoveString$Value",
-"transforms.ClearUnicode.fields": "dirtyfield",
-"transforms.ClearUnicode.predicate": "IsFoo",
+"transforms": "RemoveString",
+"transforms.RemoveString.type": "ru.rgs.kafka.connect.transforms.RemoveString$Value",
+"transforms.RemoveString.fields": "dirtyfield",
+"transforms.RemoveString.removement": "\\u0000",
+"transforms.RemoveString.predicate": "IsFoo",
 
 "predicates": "IsFoo",
 "predicates.IsFoo.type": "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
