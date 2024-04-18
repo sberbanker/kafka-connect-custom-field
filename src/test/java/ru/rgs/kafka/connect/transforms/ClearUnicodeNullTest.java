@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 sberbanker (faleksei@mail.ru)
+ * Copyright © 2023 sberbanker (faleksei@mail.ru)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,15 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RemoveStringTest {
-    private final RemoveString<SourceRecord> xformKey = new RemoveString.Key<>();
-    private final RemoveString<SourceRecord> xformValue = new RemoveString.Value<>();
+public class ClearUnicodeNullTest {
+    private final ClearUnicodeNull<SourceRecord> xformKey = new ClearUnicodeNull.Key<>();
+    private final ClearUnicodeNull<SourceRecord> xformValue = new ClearUnicodeNull.Value<>();
 
     private static final Schema SCHEMA = SchemaBuilder.struct()
             .field("foo", Schema.STRING_SCHEMA)
@@ -41,11 +43,11 @@ public class RemoveStringTest {
 
     static {
         VALUES.put("foo", "TESTME");
-        VALUES.put("bar", "\\u0000\\u0000TESTME\\u0000\\u0000\\u0000\\u0000");
+        VALUES.put("bar", "\u0000TESTME\u0000");
         VALUES.put("baz", 12.34d);
 
         VALUES_WITH_SCHEMA.put("foo", "TESTME");
-        VALUES_WITH_SCHEMA.put("bar", "\\u0000\\u0000TESTME\\u0000\\u0000\\u0000\\u0000");
+        VALUES_WITH_SCHEMA.put("bar", "\u0000TESTME\u0000");
         VALUES_WITH_SCHEMA.put("baz", 12.34d);
     }
 
@@ -53,8 +55,8 @@ public class RemoveStringTest {
         return new SourceRecord(null, null, "topic", 0, null, key, null, value);
     }
 
-    private SourceRecord createRecordWithSchema() {
-        return new SourceRecord(null, null, "topic", 0, RemoveStringTest.SCHEMA, RemoveStringTest.VALUES_WITH_SCHEMA, RemoveStringTest.SCHEMA, RemoveStringTest.VALUES_WITH_SCHEMA);
+    private SourceRecord createRecordWithSchema(Schema keySchema, Object key, Schema valueSchema, Object value) {
+        return new SourceRecord(null, null, "topic", 0, keySchema, key, valueSchema, value);
     }
 
     @AfterEach
@@ -65,35 +67,24 @@ public class RemoveStringTest {
 
     @Test
     public void testVersionRetrievedFromAppInfoParser() {
-
         assertEquals(AppInfoParser.getVersion(), xformKey.version());
         assertEquals(AppInfoParser.getVersion(), xformValue.version());
-
         assertEquals(xformKey.version(), xformValue.version());
-    }
-
-    private static Map<String, String> config (String fields, String removement) {
-        Map<String, String> config = new HashMap<>();
-        config.put(RemoveString.FIELDS_CONFIG, fields);
-        config.put(RemoveString.REMOVEMENT_CONFIG, removement);
-        return config;
     }
 
     @Test
     public void testConfigNullFields() {
-        assertThrows(ConfigException.class, () -> xformKey.configure(config(null, "\\u0000")));
-        assertThrows(ConfigException.class, () -> xformKey.configure(config("foo", null)));
+        assertThrows(ConfigException.class, () -> xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, null)));
     }
 
     @Test
     public void testConfigEmptyFields() {
-        assertThrows(ConfigException.class, () -> xformKey.configure(config("", "\\u0000")));
-        assertThrows(ConfigException.class, () -> xformKey.configure(config("foo", "")));
+        assertThrows(ConfigException.class, () -> xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "")));
     }
 
     @Test
     public void testNullKeySchemaless() {
-        xformKey.configure(config("bar", "\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
         SourceRecord original = createRecordSchemaless(null, VALUES);
         SourceRecord transformed = xformKey.apply(original);
         assertEquals(original, transformed);
@@ -101,7 +92,7 @@ public class RemoveStringTest {
 
     @Test
     public void testNullValueSchemaless() {
-        xformKey.configure(config("bar", "\\u0000"));
+        xformValue.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
         SourceRecord original = createRecordSchemaless(VALUES, null);
         SourceRecord transformed = xformValue.apply(original);
         assertEquals(original, transformed);
@@ -110,7 +101,7 @@ public class RemoveStringTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testKeySchemaless() {
-        xformKey.configure(config("bar", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
 
         SourceRecord original = createRecordSchemaless(VALUES, VALUES);
         SourceRecord transformed = xformKey.apply(original);
@@ -121,7 +112,7 @@ public class RemoveStringTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testValueSchemaless() {
-        xformValue.configure(config("bar", "\\\\u0000"));
+        xformValue.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
 
         SourceRecord original = createRecordSchemaless(VALUES, VALUES);
         SourceRecord transformed = xformValue.apply(original);
@@ -131,9 +122,9 @@ public class RemoveStringTest {
 
     @Test
     public void testKeyWithSchema() {
-        xformKey.configure(config("bar", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
 
-        SourceRecord original = createRecordWithSchema();
+        SourceRecord original = createRecordWithSchema(SCHEMA, VALUES_WITH_SCHEMA, SCHEMA, VALUES_WITH_SCHEMA);
         SourceRecord transformed = xformKey.apply(original);
 
         assertEquals("TESTME", ((Struct) transformed.key()).get("bar"));
@@ -141,9 +132,9 @@ public class RemoveStringTest {
 
     @Test
     public void testValueWithSchema() {
-        xformValue.configure(config("bar", "\\\\u0000"));
+        xformValue.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "bar"));
 
-        SourceRecord original = createRecordWithSchema();
+        SourceRecord original = createRecordWithSchema(SCHEMA, VALUES_WITH_SCHEMA, SCHEMA, VALUES_WITH_SCHEMA);
         SourceRecord transformed = xformValue.apply(original);
 
         assertEquals("TESTME", ((Struct) transformed.value()).get("bar"));
@@ -152,21 +143,21 @@ public class RemoveStringTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testNonStringSchemaless() {
-        xformValue.configure(config("baz", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "baz"));
 
-        SourceRecord original = createRecordSchemaless(null, VALUES);
-        SourceRecord transformed = xformValue.apply(original);
+        SourceRecord original = createRecordSchemaless(VALUES, VALUES);
+        SourceRecord transformed = xformKey.apply(original);
 
-        assertEquals(VALUES.get("baz"), ((HashMap<String, Object>)transformed.value()).get("baz"));
+        assertEquals(VALUES.get("baz"), ((HashMap<String, Object>)transformed.key()).get("baz"));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void testAbsentFieldSchemaless() {
-        xformValue.configure(config("qux", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "qux"));
 
-        SourceRecord original = createRecordSchemaless(null, VALUES);
-        SourceRecord transformed = xformValue.apply(original);
+        SourceRecord original = createRecordSchemaless(VALUES, VALUES);
+        SourceRecord transformed = xformKey.apply(original);
 
         assertEquals(VALUES.get("foo"), ((HashMap<String, Object>)transformed.value()).get("foo"));
         assertEquals(VALUES.get("bar"), ((HashMap<String, Object>)transformed.value()).get("bar"));
@@ -175,23 +166,23 @@ public class RemoveStringTest {
 
     @Test
     public void testNonStringSchema() {
-        xformValue.configure(config("baz", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "baz"));
 
-        SourceRecord original = createRecordWithSchema();
-        SourceRecord transformed = xformValue.apply(original);
+        SourceRecord original = createRecordWithSchema(SCHEMA, VALUES_WITH_SCHEMA, SCHEMA, VALUES_WITH_SCHEMA);
+        SourceRecord transformed = xformKey.apply(original);
 
-        assertEquals(VALUES.get("baz"), ((Struct) transformed.value()).get("baz"));
+        assertEquals(VALUES.get("baz"), ((Struct) transformed.key()).get("baz"));
     }
 
     @Test
     public void testAbsentFieldSchema() {
-        xformValue.configure(config("qux", "\\\\u0000"));
+        xformKey.configure(Collections.singletonMap(ClearUnicodeNull.FIELDS_CONFIG, "qux"));
 
-        SourceRecord original = createRecordWithSchema();
-        SourceRecord transformed = xformValue.apply(original);
+        SourceRecord original = createRecordWithSchema(SCHEMA, VALUES_WITH_SCHEMA, SCHEMA, VALUES_WITH_SCHEMA);
+        SourceRecord transformed = xformKey.apply(original);
 
-        assertEquals(VALUES.get("foo"), ((Struct) transformed.value()).get("foo"));
-        assertEquals(VALUES.get("bar"), ((Struct) transformed.value()).get("bar"));
-        assertEquals(VALUES.get("baz"), ((Struct) transformed.value()).get("baz"));
+        assertEquals(VALUES.get("foo"), ((Struct) transformed.key()).get("foo"));
+        assertEquals(VALUES.get("bar"), ((Struct) transformed.key()).get("bar"));
+        assertEquals(VALUES.get("baz"), ((Struct) transformed.key()).get("baz"));
     }
 }

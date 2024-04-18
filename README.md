@@ -65,6 +65,17 @@
 "transforms.keyStructCast.type": "ru.rgs.kafka.connect.transforms.StructConverter$Key",
 "transforms.valueStructCast.type": "ru.rgs.kafka.connect.transforms.StructConverter$Value"
 ```
+#### ClearUnicodeNull
+```json lines
+"transforms": "ClearUnicode",
+"transforms.ClearUnicode.type": "ru.rgs.kafka.connect.transforms.ClearUnicodeNull$Value",
+"transforms.ClearUnicode.fields": "dirtyfield",
+"transforms.ClearUnicode.predicate": "IsFoo",
+
+"predicates": "IsFoo",
+"predicates.IsFoo.type": "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+"predicates.IsFoo.pattern": "foo",
+```
 
 #### RemoveString
 ```json lines

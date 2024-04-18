@@ -32,25 +32,17 @@ import java.util.*;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStruct;
 
-public abstract class RemoveString<R extends ConnectRecord<R>> implements Transformation<R>, Versioned {
+public abstract class ClearUnicodeNull<R extends ConnectRecord<R>> implements Transformation<R>, Versioned {
 
-    public static final String OVERVIEW_DOC = "Remove custom string part in specified fields of type `String`.";
+    public static final String OVERVIEW_DOC = "This transformation is used to remove Unicode null symbol 0x00 from string values.";
+
     public static final String FIELDS_CONFIG = "fields";
-    public static final String REMOVEMENT_CONFIG = "removement";
-
-
+    private static final String PURPOSE = "remove Unicode null symbol";
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
             .define(FIELDS_CONFIG, ConfigDef.Type.LIST, ConfigDef.NO_DEFAULT_VALUE, new NonEmptyListValidator(),
-                    ConfigDef.Importance.HIGH, "Names of fields to remove part.")
-            .define(REMOVEMENT_CONFIG, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE,
-                    ConfigDef.CompositeValidator.of(new ConfigDef.NonNullValidator(), new ConfigDef.NonEmptyString()),
-                    ConfigDef.Importance.HIGH, "Custom value removement, that will be remove from all"
-                            + " 'fields' values of type `String`.");
+                    ConfigDef.Importance.HIGH, "The field containing null unicode symbol \u0000");
 
-    private static final String PURPOSE = "remove string part";
-
-    private Set<String> removedFields;
-    private String removement;
+    private Set<String> fields = Collections.emptySet();
 
     @Override
     public String version() {
@@ -60,10 +52,8 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
     @Override
     public void configure(Map<String, ?> props) {
         final SimpleConfig config = new SimpleConfig(CONFIG_DEF, props);
-        removedFields = new HashSet<>(config.getList(FIELDS_CONFIG));
-        removement = config.getString(REMOVEMENT_CONFIG);
+        fields = new HashSet<>(config.getList(FIELDS_CONFIG));
     }
-
     @Override
     public R apply(R record) {
         if (operatingValue(record) == null) {
@@ -78,7 +68,7 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
     private R applySchemaless(R record) {
         final Map<String, Object> value = requireMap(operatingValue(record), PURPOSE);
         final HashMap<String, Object> updatedValue = new HashMap<>(value);
-        for (String field : removedFields) {
+        for (String field : fields) {
             final Object origFieldValue = value.get(field);
             updatedValue.put(field, value.containsKey(field) ? removed(origFieldValue) : origFieldValue);
         }
@@ -90,7 +80,7 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
         final Struct updatedValue = new Struct(value.schema());
         for (Field field : value.schema().fields()) {
             final Object origFieldValue = value.get(field);
-            updatedValue.put(field, removedFields.contains(field.name()) ? removed(origFieldValue) : origFieldValue);
+            updatedValue.put(field, fields.contains(field.name()) ? removed(origFieldValue) : origFieldValue);
         }
         return newRecord(record, updatedValue);
     }
@@ -99,9 +89,8 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
         if (value == null || value.getClass() != String.class) {
             return value;
         }
-        return value.toString().replaceAll(removement, "");
+        return value.toString().replaceAll("\\u0000", "");
     }
-
     @Override
     public ConfigDef config() {
         return CONFIG_DEF;
@@ -117,7 +106,7 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
 
     protected abstract R newRecord(R base, Object value);
 
-    public static final class Key<R extends ConnectRecord<R>> extends RemoveString<R> {
+    public static final class Key<R extends ConnectRecord<R>> extends ClearUnicodeNull<R> {
         @Override
         protected Schema operatingSchema(R record) {
             return record.keySchema();
@@ -134,7 +123,7 @@ public abstract class RemoveString<R extends ConnectRecord<R>> implements Transf
         }
     }
 
-    public static final class Value<R extends ConnectRecord<R>> extends RemoveString<R> {
+    public static final class Value<R extends ConnectRecord<R>> extends ClearUnicodeNull<R> {
         @Override
         protected Schema operatingSchema(R record) {
             return record.valueSchema();
