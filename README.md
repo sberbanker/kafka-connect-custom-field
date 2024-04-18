@@ -69,7 +69,7 @@
 #### ClearUnicodeNull
 ```json lines
 "transforms": "ClearUnicode",
-"transforms.ClearUnicode.type": "ru.rgs.kafka.connect.transforms.ClearUnicodeNull$Value",
+"transforms.ClearUnicode.type": "ru.rgs.kafka.connect.transforms.RemoveString$Value",
 "transforms.ClearUnicode.fields": "dirtyfield",
 "transforms.ClearUnicode.predicate": "IsFoo",
 
